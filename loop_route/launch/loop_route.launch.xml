@@ -1,0 +1,18 @@
+<launch>
+  <arg name="enalbe_loop" default="true"/>
+  <arg name="input_topic_start_pose" default="/initialpose3d"/>
+  <arg name="input_topic_end_pose" default="/planning/mission_planning/goal"/>
+  <arg name="input_topic_autoware" default="/autoware/state"/>
+  <arg name="output_topic_goal" default="/planning/mission_planning/goal"/>
+  <arg name="output_topic_state" default="/api/operation_mode/state"/>
+
+  <group if="$(var enalbe_loop)">
+    <node pkg="loop_route" exec="loop_route" name="loop_route" output="screen">
+      <remap from="input_start_pose" to="$(var input_topic_start_pose)"/>
+      <remap from="input_end_pose" to="$(var input_topic_end_pose)"/>
+      <remap from="input_autoware_state" to="$(var input_topic_autoware)"/>
+      <remap from="output_goal" to="$(var output_topic_goal)"/>
+      <remap from="output_state" to="$(var output_topic_state)"/>
+    </node>
+  </group>
+</launch>
