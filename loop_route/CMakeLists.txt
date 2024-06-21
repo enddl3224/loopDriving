@@ -11,14 +11,14 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(autoware_auto_system_msgs REQUIRED)
-find_package(autoware_adapi_v1_msgs REQUIRED)
+find_package(autoware_auto_vehicle_msgs REQUIRED)
 
 # include directories
 include_directories(include)
 
 # create library
 add_library(looproute SHARED src/loop_route.cpp)
-ament_target_dependencies(looproute rclcpp geometry_msgs autoware_auto_system_msgs autoware_adapi_v1_msgs)
+ament_target_dependencies(looproute rclcpp geometry_msgs autoware_auto_system_msgs autoware_auto_vehicle_msgs)
 
 # create executable
 add_executable(loop_route src/loop_route_node.cpp)

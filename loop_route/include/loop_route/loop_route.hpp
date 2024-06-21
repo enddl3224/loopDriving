@@ -3,7 +3,7 @@
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "autoware_auto_system_msgs/msg/autoware_state.hpp"
-#include "autoware_adapi_v1_msgs/msg/operation_mode_state.hpp"
+#include "autoware_auto_vehicle_msgs/msg/engage.hpp"
 #include "std_msgs/msg/u_int8.hpp"
 
 namespace loop_route
@@ -24,7 +24,7 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr sub_end_pose_;
   rclcpp::Subscription<autoware_auto_system_msgs::msg::AutowareState>::SharedPtr sub_state_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
-  rclcpp::Publisher<autoware_adapi_v1_msgs::msg::OperationModeState>::SharedPtr state_pub_;
+  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::Engage>::SharedPtr engage_pub_;
 
   autoware_auto_system_msgs::msg::AutowareState autoware_state_;
   geometry_msgs::msg::PoseStamped start_pose_;
@@ -34,8 +34,8 @@ private:
   bool received_autoware_state_ = false;
   bool ready_to_publish_pose = false;
   bool goal_pose_published_ = false;
-  bool state_pose_published_ = false;
-  bool received_first_goal_ = true;
+  bool engage_pose_published_ = false;
+  bool received_first_goal_ = false;
   bool main_course_ = true;
 
 };
