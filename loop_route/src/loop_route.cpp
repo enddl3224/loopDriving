@@ -71,12 +71,14 @@ void LoopRoute::callbackEndPose(const geometry_msgs::msg::PoseStamped::ConstShar
   // msg의 타임스탬프와 현재 시간의 차이 계산
   rclcpp::Duration time_difference = now - msg->header.stamp;
   double time_difference_seconds = time_difference.seconds();
+  RCLCPP_INFO(this->get_logger(), "time_difference_seconds: %f",time_difference_seconds);
   // end_pose_의 타임스탬프와 현재 시간의 차이 계산
   rclcpp::Duration end_difference = now - end_pose_.header.stamp;
   double end_difference_seconds = end_difference.seconds();
+  RCLCPP_INFO(this->get_logger(), "end_difference_seconds: %f",end_difference_seconds);
   // initial_pose가 goal pose로 잡힐 경우를 제외하고 새로운 goal_pose를 생성했을 경우
   // 새로운 goal_pose를 end_pose에 넣어야 함 (= goal_pose를 아직 받지 않은 것과 동일함)
-  if((start_pose_.header.stamp != msg->header.stamp)
+  if((start_pose_.header.stamp != msg->header.stamp) && received_first_goal_
       && (end_difference_seconds>time_difference_seconds)){
     RCLCPP_INFO(this->get_logger(), "!!changed the goal pose!!");
     received_first_goal_ = false;
@@ -87,7 +89,7 @@ void LoopRoute::callbackEndPose(const geometry_msgs::msg::PoseStamped::ConstShar
     end_pose_.header = msg->header;
     end_pose_.pose = msg->pose;
     received_first_goal_ = true;
-    // RCLCPP_INFO(this->get_logger(),"end_pose_.pose.position.x: %f",end_pose_.pose.position.x);
+    RCLCPP_INFO(this->get_logger(),"end_pose_.pose.position.x: %f",end_pose_.pose.position.x);
   }
 }
 
@@ -97,6 +99,7 @@ void LoopRoute::callbackCheckPoint(const geometry_msgs::msg::PoseStamped::ConstS
   RCLCPP_INFO(this->get_logger(), "Get CheckPoint");
   checkpoint_.header = msg->header;
   checkpoint_.pose = msg->pose;
+  received_checkpoint_ = true;
 }
 
 // get autoware state
@@ -139,9 +142,11 @@ void LoopRoute::callbackAutowareState(const AutowareState::ConstSharedPtr msg)
       goal_pose.pose = end_pose_.pose;
       main_course_ = true;
       pose_pub_->publish(goal_pose);
-      // MainCourse 경우에 Checkpoint가 있는 경우가 있는데,
+      // MainCourse 경우에 Checkpoint가 있는 경우가 있는데, 있을 경우에만 발행하고,
       // Checkpoint는 goal_pose가 발행된 후에 발행할 수 있다.
-      checkpoint_pub_->publish(checkpoint_);
+      if(received_checkpoint_){
+        checkpoint_pub_->publish(checkpoint_);
+      }  
     }
     goal_pose_published_ = true;
   }

@@ -36,6 +36,7 @@ private:
   geometry_msgs::msg::PoseStamped checkpoint_;
   
   bool received_autoware_state_ = false;
+  bool received_checkpoint_ = false;
   bool ready_to_publish_pose = false;
   bool goal_pose_published_ = false;
   bool engage_pose_published_ = false;
