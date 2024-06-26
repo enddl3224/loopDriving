@@ -47,6 +47,7 @@ void LoopRoute::callbackStartPose(const geometry_msgs::msg::PoseWithCovarianceSt
   }
   start_pose_.header = msg.header;
   start_pose_.pose = msg.pose.pose;
+  RCLCPP_INFO(this->get_logger(),"start_pose_.pose.position.x: %f",start_pose_.pose.position.x);
 }
 
 // get goal pose(=end pose)
@@ -78,7 +79,8 @@ void LoopRoute::callbackEndPose(const geometry_msgs::msg::PoseStamped::ConstShar
   RCLCPP_INFO(this->get_logger(), "end_difference_seconds: %f",end_difference_seconds);
   // initial_pose가 goal pose로 잡힐 경우를 제외하고 새로운 goal_pose를 생성했을 경우
   // 새로운 goal_pose를 end_pose에 넣어야 함 (= goal_pose를 아직 받지 않은 것과 동일함)
-  if((start_pose_.header.stamp != msg->header.stamp) && received_first_goal_
+  RCLCPP_INFO(this->get_logger(),"received_first_goal_: %d",received_first_goal_);
+  if((start_pose_.header.stamp != msg->header.stamp)
       && (end_difference_seconds>time_difference_seconds)){
     RCLCPP_INFO(this->get_logger(), "!!changed the goal pose!!");
     received_first_goal_ = false;
@@ -142,6 +144,7 @@ void LoopRoute::callbackAutowareState(const AutowareState::ConstSharedPtr msg)
       goal_pose.pose = end_pose_.pose;
       main_course_ = true;
       pose_pub_->publish(goal_pose);
+      RCLCPP_INFO(this->get_logger(), "Pub goal_pose");
       // MainCourse 경우에 Checkpoint가 있는 경우가 있는데, 있을 경우에만 발행하고,
       // Checkpoint는 goal_pose가 발행된 후에 발행할 수 있다.
       if(received_checkpoint_){
@@ -154,10 +157,12 @@ void LoopRoute::callbackAutowareState(const AutowareState::ConstSharedPtr msg)
   // publish engage (AUTO button 눌러주기)
   if(goal_pose_published_ && !engage_pose_published_ && (loop_limit_>0)
       && autoware_state_.state == AutowareState::WAITING_FOR_ENGAGE){
+    RCLCPP_INFO(this->get_logger(), "Pub Engage! READY");
     autoware_auto_vehicle_msgs::msg::Engage engage_for_auto;
     engage_for_auto.stamp = this->get_clock()->now();
     engage_for_auto.engage = true;
     engage_pub_->publish(engage_for_auto);
+    RCLCPP_INFO(this->get_logger(), "Pub Engage SUCCESS!");
     engage_pose_published_ = true;
   }
 }
