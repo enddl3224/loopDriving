@@ -141,7 +141,10 @@ void LoopRoute::callbackAutowareState(const AutowareState::ConstSharedPtr msg)
       pose_pub_->publish(goal_pose);
       // MainCourse 경우에 Checkpoint가 있는 경우가 있는데,
       // Checkpoint는 goal_pose가 발행된 후에 발행할 수 있다.
-      checkpoint_pub_->publish(checkpoint_);
+      if(checkpoint_.pose.position.x != 0.0){
+        checkpoint_pub_->publish(checkpoint_);
+      }
+      
     }
     goal_pose_published_ = true;
   }
